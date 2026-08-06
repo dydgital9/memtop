@@ -1,0 +1,17 @@
+# Runtime output
+*.log
+*.csv
+*.json
+
+# Temporary files
+*.tmp
+*.swp
+*~
+
+# Editor and OS metadata
+.vscode/
+.idea/
+.DS_Store
+
+# Local test artifacts
+.coverage

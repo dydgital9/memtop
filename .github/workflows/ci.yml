@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install development checks
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes \
+            groff-base \
+            shellcheck
+
+      - name: Run project checks
+        run: make check
+
+      - name: Run ShellCheck
+        run: make lint
