@@ -1,0 +1,209 @@
+.TH MEMTOP 1 "August 2026" "memtop" "User Commands"
+.SH NAME
+memtop \- show Linux processes by resident memory usage
+.SH SYNOPSIS
+.B memtop
+.RI [ options ]
+.SH DESCRIPTION
+.B memtop
+is a Bash and awk command-line process memory inspector for Linux.
+It reads process data from GNU
+.BR ps (1),
+orders rows by resident set size or memory percentage, applies optional
+filters, and renders a table, JSON document, or CSV stream.
+.PP
+The default invocation shows 20 processes ordered from highest to lowest RSS.
+.SH OPTIONS
+.SS Selection and sorting
+.TP
+.BR \-n " " N ", " \-\-num " " N ", " \-\-num= N
+Show at most
+.I N
+rows. The default is 20.
+.TP
+.BR \-s " " FIELD ", " \-\-sort " " FIELD ", " \-\-sort= FIELD
+Sort by
+.B rss
+or
+.BR pmem .
+The default is
+.BR rss .
+.TP
+.BR \-u " " UNIT ", " \-\-unit " " UNIT ", " \-\-unit= UNIT
+Display RSS with
+.BR auto ,
+.BR kb ,
+.BR mb ,
+or
+.BR gb .
+.TP
+.BR \-\-user " " USER ", " \-\-user= USER
+Show only processes owned by
+.IR USER .
+.TP
+.BR \-\-pid " " PID ", " \-\-pid= PID
+Show only the specified process ID.
+.TP
+.BR \-\-limit-rss " " SIZE ", " \-\-limit-rss= SIZE
+Show only processes whose RSS is at least
+.IR SIZE .
+Accepted suffixes are K, M, and G. A suffix-free value is interpreted as KiB.
+.TP
+.B \-\-reverse
+Reverse the selected sort order.
+.SS Presentation
+.TP
+.BR \-f ", " \-\-full
+Show the full command line instead of the command name.
+.TP
+.B \-\-no-header
+Do not print the table or CSV header.
+.TP
+.B \-\-plain
+Disable ANSI color and suppress the header.
+.TP
+.BR \-\-self ", " \-\-hide-self
+Hide memtop, ps, and awk helper processes from the result.
+The
+.B \-\-self
+name is retained as a compatibility alias.
+.TP
+.B \-\-tree
+Add PPID and light process-tree indentation.
+.TP
+.BI \-\-width " N"
+Trim displayed command text to at most
+.I N
+characters.
+.TP
+.B \-\-summary
+Add displayed RSS and memory-percentage totals to table or CSV output.
+JSON output already contains aggregate fields.
+.TP
+.B \-\-no-color
+Disable ANSI color.
+.TP
+.B \-\-color
+Force ANSI color.
+.SS Output and repeated collection
+.TP
+.B \-\-json
+Write a JSON document.
+.TP
+.B \-\-csv
+Write CSV output.
+.TP
+.BR \-\-log " " FILE ", " \-\-log= FILE
+Append each rendered snapshot to
+.IR FILE .
+.TP
+.BR \-w " " SEC ", " \-\-watch " " SEC ", " \-\-watch= SEC
+Refresh every
+.I SEC
+seconds. Decimal intervals such as 0.5 are accepted.
+.TP
+.B \-\-once
+Run one collection even when watch mode is supplied.
+.TP
+.BR \-h ", " \-\-help
+Show command help and exit.
+.SH SIZE VALUES
+Examples of valid minimum RSS values:
+.PP
+.nf
+500M
+1.5G
+250000K
+250000
+.fi
+.PP
+K, M, and G are converted using powers of 1024.
+.SH OUTPUT
+Table output may contain PID, PPID, percent memory, formatted RSS, user, and
+command columns depending on the selected options.
+.PP
+JSON output contains a generated timestamp, selected sort and unit, a process
+array, displayed row count, total RSS, and total memory percentage.
+.PP
+CSV output uses this header by default:
+.PP
+.nf
+pid,ppid,pmem,rss_kb,rss,user,command
+.fi
+.SH EXAMPLES
+Show the default process list:
+.PP
+.nf
+memtop
+.fi
+.PP
+Show ten processes with full command lines:
+.PP
+.nf
+memtop --num 10 --full
+.fi
+.PP
+Show processes using at least 500 MiB of RSS:
+.PP
+.nf
+memtop --limit-rss 500M --summary
+.fi
+.PP
+Inspect one process:
+.PP
+.nf
+memtop --pid 1928 --full --tree
+.fi
+.PP
+Produce and validate JSON:
+.PP
+.nf
+memtop --json --num 5 | python3 -m json.tool
+.fi
+.PP
+Save CSV:
+.PP
+.nf
+memtop --csv --num 100 > memtop.csv
+.fi
+.PP
+Refresh every two seconds:
+.PP
+.nf
+memtop --watch 2 --hide-self
+.fi
+.PP
+Append snapshots to a log:
+.PP
+.nf
+memtop --watch 5 --log "$HOME/memtop.log"
+.fi
+.SH FILES
+.TP
+.I $HOME/.local/bin/memtop
+Typical user-local executable path.
+.TP
+.I $HOME/.local/share/man/man1/memtop.1
+Typical user-local manual page path.
+.SH EXIT STATUS
+Zero indicates success. A nonzero status indicates invalid input or a runtime
+failure from memtop or a command in its process collection pipeline.
+.SH SECURITY
+Full process command lines can contain tokens, passwords, file paths, or other
+sensitive arguments. Review output before sharing logs or reports.
+.SH LIMITATIONS
+RSS is not a direct measure of unique physical memory because shared pages may
+be counted in more than one process. Tree indentation is a lightweight view
+constructed from PPID data and is not a replacement for a dedicated process
+tree inspector.
+.SH AUTHOR
+Maintained by dydgital9.
+.SH LICENSE
+MIT License.
+.SH SEE ALSO
+.BR ps (1),
+.BR top (1),
+.BR pgrep (1),
+.BR awk (1),
+.BR free (1),
+.BR smem (8)
