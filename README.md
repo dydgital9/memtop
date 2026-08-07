@@ -67,10 +67,10 @@ the machine and active workload.
 
 ```text
     PID   %MEM        RSS USER         COMMAND
-   4821    8.7     712.4M dk           firefox
-   1964    4.2     342.8M dk           cinnamon
-   2310    2.6     211.5M dk           Xorg
-   5177    1.4     114.9M dk           alacritty
+   4821    8.7     712.4M user           firefox
+   1964    4.2     342.8M user           cinnamon
+   2310    2.6     211.5M user           Xorg
+   5177    1.4     114.9M user           alacritty
 ```
 
 Use `--no-color` when redirecting table output to a file or pager.
@@ -398,7 +398,7 @@ values. The structure is similar to:
       "pmem": 8.7,
       "rss_kb": 729498,
       "rss": "712.4M",
-      "user": "dk",
+      "user": "user",
       "command": "firefox"
     }
   ],
