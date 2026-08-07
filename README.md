@@ -5,10 +5,7 @@
 [![Language: Bash](https://img.shields.io/badge/language-Bash-4EAA25.svg?logo=gnu-bash&logoColor=white)](memtop)
 [![Platform: Linux](https://img.shields.io/badge/platform-Linux-1793D1.svg?logo=linux&logoColor=white)](#requirements)
 
-`memtop` is a lightweight Linux command-line process memory inspector written
-in Bash and `awk`. It lists processes by resident memory or memory percentage,
-supports focused filtering, and can produce terminal, JSON, CSV, watch, and log
-output.
+Lightweight Bash memory and process monitor for Linux using ps and awk, with live watch mode, human-readable output, filtering, sorting, and JSON/CSV export.
 
 The project is designed as a practical alternative to repeatedly assembling
 long `ps`, `sort`, and `awk` pipelines during troubleshooting.
