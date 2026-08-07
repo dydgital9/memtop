@@ -288,6 +288,7 @@ memtop --json --num 5 |
 | `--summary` | Add totals to table or CSV output |
 | `--no-color` | Disable ANSI color |
 | `--color` | Force ANSI color |
+| `-V`, `--version` | Show version information and exit |
 
 The `--self` name is retained as a compatibility alias. Its current behavior is
 to hide the `memtop`, `ps`, and `awk` helper processes.
@@ -611,7 +612,6 @@ memtop/
 
 Planned improvements:
 
-- Add a stable `--version` option and semantic release version.
 - Add Bats tests for argument validation and output edge cases.
 - Improve watch behavior for redirected JSON and CSV streams.
 - Add release archives and SHA-256 checksums.

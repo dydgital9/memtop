@@ -1,108 +1,231 @@
 # Bash completion for memtop.
 #
-# Install to:
+# Installed by the memtop Makefile as:
+#
 #   ~/.local/share/bash-completion/completions/memtop
 #
-# Or load directly:
-#   source ./completions/memtop.bash
+# This file is intentionally dependency-light and does not require
+# _init_completion or other bash-completion helper functions.
 
-_memtop_complete()
+_memtop()
 {
-    local cur prev
+    local cur prev value
+    local opts
+
     cur=${COMP_WORDS[COMP_CWORD]}
-    prev=${COMP_WORDS[COMP_CWORD-1]}
+    prev=""
+
+    if (( COMP_CWORD > 0 )); then
+        prev=${COMP_WORDS[COMP_CWORD - 1]}
+    fi
+
+    opts='
+        -n
+        --num
+        -s
+        --sort
+        -u
+        --unit
+        --user
+        -f
+        --full
+        --no-header
+        --plain
+        --self
+        --hide-self
+        --tree
+        --pid
+        --limit-rss
+        --json
+        --csv
+        --log
+        -w
+        --watch
+        --once
+        --width
+        --reverse
+        --summary
+        --no-color
+        --color
+        -h
+        --help
+        -V
+        --version
+    '
+
+    # --------------------------------------------------------------
+    # Complete values following options that take arguments.
+    # --------------------------------------------------------------
 
     case "$prev" in
         -s|--sort)
             COMPREPLY=(
-                $(compgen -W 'rss pmem' -- "$cur")
+                $(
+                    compgen \
+                        -W 'rss pmem' \
+                        -- "$cur"
+                )
             )
             return
             ;;
+
         -u|--unit)
             COMPREPLY=(
-                $(compgen -W 'auto kb mb gb' -- "$cur")
+                $(
+                    compgen \
+                        -W 'auto kb mb gb' \
+                        -- "$cur"
+                )
             )
             return
             ;;
+
         --user)
             COMPREPLY=(
-                $(compgen -u -- "$cur")
+                $(
+                    compgen \
+                        -u \
+                        -- "$cur"
+                )
             )
             return
             ;;
+
         --pid)
-            COMPREPLY=(
-                $(compgen -W "$(ps -e -o pid= 2>/dev/null)" -- "$cur")
-            )
+            if command -v ps >/dev/null 2>&1; then
+                COMPREPLY=(
+                    $(
+                        compgen \
+                            -W "$(
+                                ps \
+                                    -eo pid= \
+                                    2>/dev/null
+                            )" \
+                            -- "$cur"
+                    )
+                )
+            fi
             return
             ;;
+
         --log)
             COMPREPLY=(
-                $(compgen -f -- "$cur")
+                $(
+                    compgen \
+                        -f \
+                        -- "$cur"
+                )
             )
+            return
+            ;;
+
+        -n|--num|--limit-rss|-w|--watch|--width)
+            # Numeric or size values do not need an invented completion.
+            COMPREPLY=()
             return
             ;;
     esac
+
+
+    # --------------------------------------------------------------
+    # Support --option=value completion for options that have a
+    # known fixed set of values.
+    # --------------------------------------------------------------
 
     case "$cur" in
         --sort=*)
-            local value=${cur#--sort=}
+            value=${cur#--sort=}
+
             COMPREPLY=(
-                $(compgen -P '--sort=' -W 'rss pmem' -- "$value")
+                $(
+                    compgen \
+                        -W 'rss pmem' \
+                        -- "$value"
+                )
             )
+
+            COMPREPLY=(
+                "${COMPREPLY[@]/#/--sort=}"
+            )
+
             return
             ;;
+
         --unit=*)
-            local value=${cur#--unit=}
+            value=${cur#--unit=}
+
             COMPREPLY=(
-                $(compgen -P '--unit=' -W 'auto kb mb gb' -- "$value")
+                $(
+                    compgen \
+                        -W 'auto kb mb gb' \
+                        -- "$value"
+                )
             )
+
+            COMPREPLY=(
+                "${COMPREPLY[@]/#/--unit=}"
+            )
+
             return
             ;;
+
         --user=*)
-            local value=${cur#--user=}
+            value=${cur#--user=}
+
             COMPREPLY=(
-                $(compgen -P '--user=' -u -- "$value")
+                $(
+                    compgen \
+                        -u \
+                        -- "$value"
+                )
             )
+
+            COMPREPLY=(
+                "${COMPREPLY[@]/#/--user=}"
+            )
+
             return
             ;;
-        --log=*)
-            local value=${cur#--log=}
-            COMPREPLY=(
-                $(compgen -P '--log=' -f -- "$value")
-            )
+
+        --pid=*)
+            value=${cur#--pid=}
+
+            if command -v ps >/dev/null 2>&1; then
+                COMPREPLY=(
+                    $(
+                        compgen \
+                            -W "$(
+                                ps \
+                                    -eo pid= \
+                                    2>/dev/null
+                            )" \
+                            -- "$value"
+                    )
+                )
+
+                COMPREPLY=(
+                    "${COMPREPLY[@]/#/--pid=}"
+                )
+            fi
+
             return
             ;;
     esac
 
+
+    # --------------------------------------------------------------
+    # Default option-name completion.
+    # --------------------------------------------------------------
+
     COMPREPLY=(
-        $(compgen -W '
-            -n --num
-            -s --sort
-            -u --unit
-            --user
-            -f --full
-            --no-header
-            --plain
-            --self
-            --hide-self
-            --tree
-            --pid
-            --limit-rss
-            --json
-            --csv
-            --log
-            -w --watch
-            --once
-            --width
-            --reverse
-            --summary
-            --no-color
-            --color
-            -h --help
-        ' -- "$cur")
+        $(
+            compgen \
+                -W "$opts" \
+                -- "$cur"
+        )
     )
 }
 
-complete -F _memtop_complete memtop
+complete \
+    -F _memtop \
+    memtop

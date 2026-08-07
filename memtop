@@ -18,6 +18,9 @@
 
 set -o pipefail
 
+PROGRAM_NAME="memtop"
+PROGRAM_VERSION="0.1.0"
+
 # MEMTOP_PORTABILITY_HARDENING_V2
 # Keep command output parsing predictable across locales.
 export LC_ALL=C
@@ -76,6 +79,7 @@ Options:
       --no-color       Disable ANSI color.
       --color          Force ANSI color.
   -h, --help           Show this help.
+  -V, --version        Show version information.
 
 Size examples:
   --limit-rss=500M
@@ -269,6 +273,13 @@ while [[ $# -gt 0 ]]; do
             color_mode="always"
             shift
             ;;
+        -V|--version)
+            printf '%s %s\n' \
+                "$PROGRAM_NAME" \
+                "$PROGRAM_VERSION"
+            exit 0
+            ;;
+
         -h|--help)
             usage
             exit 0
